@@ -134,13 +134,15 @@ async function handleBet(
     bet,
   });
   game.prizePool += bet;
+  setGame(channelId, game);
 
   await interaction.reply({
-    content: `✅  You've joined with a **$${bet.toLocaleString()}** bet! Good luck 🍀`,
+    content: `✅  You've joined with a **${bet.toLocaleString()}** bet! Good luck 🍀`,
     flags: 64,
   });
 
-  await updateLobbyMessage(interaction, game);
+  // interaction.message here is the ephemeral bet message — fetch the real lobby message directly
+  await updateLobbyMessageById(interaction, game);
 }
 
 // ─── Leave ────────────────────────────────────────────────────────────────────
@@ -164,13 +166,15 @@ async function handleLeave(interaction: ButtonInteraction): Promise<void> {
   addBalance(interaction.user.id, player.bet);
   game.prizePool -= player.bet;
   game.players.splice(idx, 1);
+  setGame(channelId, game);
 
   await interaction.reply({
-    content: `✅  You left the lobby. **$${player.bet.toLocaleString()}** refunded.`,
+    content: `✅  You left the lobby. **${player.bet.toLocaleString()}** refunded.`,
     flags: 64,
   });
 
-  await updateLobbyMessage(interaction, game);
+  // interaction.message is the lobby message for Leave button — update it directly
+  await updateLobbyMessageById(interaction, game);
 }
 
 // ─── Stop ─────────────────────────────────────────────────────────────────────
@@ -536,12 +540,15 @@ async function endGame(channelId: string, client: Client): Promise<void> {
 
 // ─── Lobby Helpers ────────────────────────────────────────────────────────────
 
-async function updateLobbyMessage(
+/** Fetch the real lobby message by its saved ID and update it. */
+async function updateLobbyMessageById(
   interaction: ButtonInteraction,
   game: GameState
 ): Promise<void> {
   try {
-    const msg = interaction.message;
+    const ch = asSendable(interaction.channel);
+    if (!ch) return;
+    const msg = await ch.messages.fetch(game.messageId);
     await msg.edit({
       embeds: [buildLobbyEmbed(game.players, MAX_PLAYERS, `<@${game.hostId}>`)],
       components: [buildLobbyButtons(game.hostId)],

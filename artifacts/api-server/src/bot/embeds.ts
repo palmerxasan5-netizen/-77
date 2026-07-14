@@ -27,12 +27,17 @@ export function buildLobbyEmbed(
           .map((p) => `> 👤 **${p.displayName}** — 💵 $${p.bet.toLocaleString()}`)
           .join("\n");
 
+  const lobbyImageUrl =
+    process.env["LOBBY_IMAGE_URL"] ??
+    "https://cdn.discordapp.com/attachments/1470820767204638742/1523824380075970670/IMG_6568.jpg";
+
   return new EmbedBuilder()
     .setTitle("💣  BOMB SURVIVAL")
     .setColor(BOMB_COLOR)
     .setDescription(
       `> *A game of luck, nerves, and explosions. One wrong tile and you're out!*\n\u200b`
     )
+    .setImage(lobbyImageUrl)
     .addFields(
       {
         name: "👥 Players",
