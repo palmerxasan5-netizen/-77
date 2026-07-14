@@ -103,17 +103,19 @@ export function buildLobbyButtons(
 
 export function buildBetButtons(): ActionRowBuilder<ButtonBuilder>[] {
   const bets = [500, 1000, 2000, 3000, 4000, 5000];
-  const row = new ActionRowBuilder<ButtonBuilder>();
-  for (const b of bets) {
-    row.addComponents(
-      new ButtonBuilder()
-        .setCustomId(`bet_${b}`)
-        .setLabel(`$${b.toLocaleString()}`)
-        .setEmoji("💵")
-        .setStyle(ButtonStyle.Secondary)
-    );
-  }
-  return [row];
+  // Discord max 5 buttons per row — split 6 bets into two rows (3 + 3)
+  const row1 = new ActionRowBuilder<ButtonBuilder>();
+  const row2 = new ActionRowBuilder<ButtonBuilder>();
+  bets.forEach((b, i) => {
+    const btn = new ButtonBuilder()
+      .setCustomId(`bet_${b}`)
+      .setLabel(`${b.toLocaleString()}`)
+      .setEmoji("💵")
+      .setStyle(ButtonStyle.Secondary);
+    if (i < 3) row1.addComponents(btn);
+    else row2.addComponents(btn);
+  });
+  return [row1, row2];
 }
 
 // ─── Game Start Embed ────────────────────────────────────────────────────────
