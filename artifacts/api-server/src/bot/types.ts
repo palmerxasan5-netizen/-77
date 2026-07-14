@@ -43,4 +43,5 @@ export interface GameState {
   activePlayers: string[]; // userIds still in game
   finalTwoChosen: Record<string, "bomb" | "safe">; // for final showdown
   turnStartedAt: number;
+  turnEndsAt: number; // ms timestamp when current turn expires (for Discord countdown)
 }

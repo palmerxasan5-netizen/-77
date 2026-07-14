@@ -9,6 +9,11 @@
       "balance": 6000,
       "lastDaily": 1784051920799,
       "lastWork": 1784051891802
+    },
+    "1190333055924183172": {
+      "balance": 5000,
+      "lastDaily": null,
+      "lastWork": null
     }
   },
   "lastTaxRun": 1784051773903

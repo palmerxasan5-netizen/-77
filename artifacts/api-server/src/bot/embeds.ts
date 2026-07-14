@@ -6,11 +6,10 @@ import {
 } from "discord.js";
 import type { GameState, LobbyPlayer } from "./types.js";
 
-const BOMB_COLOR = 0xff2222;
-const GOLD_COLOR = 0xffd700;
+const BOMB_COLOR  = 0xff2222;
+const GOLD_COLOR  = 0xffd700;
 const GREEN_COLOR = 0x00c853;
-const DARK_COLOR = 0x2b2d31;
-const ORANGE_COLOR = 0xff6b00;
+const DARK_COLOR  = 0x2b2d31;
 
 // ─── Lobby Embed ────────────────────────────────────────────────────────────
 
@@ -22,7 +21,7 @@ export function buildLobbyEmbed(
   const prizePool = players.reduce((s, p) => s + p.bet, 0);
   const playerLines =
     players.length === 0
-      ? "*No players yet…*"
+      ? "*Wali qof kuma biirin…*"
       : players
           .map((p) => `> 👤 **${p.displayName}** — 💵 $${p.bet.toLocaleString()}`)
           .join("\n");
@@ -35,31 +34,31 @@ export function buildLobbyEmbed(
     .setTitle("💣  BOMB SURVIVAL")
     .setColor(BOMB_COLOR)
     .setDescription(
-      `> *A game of luck, nerves, and explosions. One wrong tile and you're out!*\n\u200b`
+      `> *Ciyaar nasiib, xoog iyo qarax. Sawir qaldan oo keliya ayaa kaa saari karta!*\n\u200b`
     )
     .setImage(lobbyImageUrl)
     .addFields(
       {
-        name: "👥 Players",
+        name: "👥 Ciyaartoyda",
         value: `\`${players.length}/${maxPlayers}\``,
         inline: true,
       },
       {
-        name: "💰 Prize Pool",
+        name: "💰 Abaalmarinta",
         value: `\`$${prizePool.toLocaleString()}\``,
         inline: true,
       },
       {
-        name: "💣 Bombs",
+        name: "💣 Dabab",
         value: "`Random`",
         inline: true,
       },
       {
-        name: "⏳ Status",
+        name: "⏳ Xaaladda",
         value:
           players.length < 2
-            ? "`Waiting for players…`"
-            : "`Ready to start!`",
+            ? "`Sugaya ciyaartoyda…`"
+            : "`Diyaar bilow!`",
         inline: false,
       },
       {
@@ -68,48 +67,44 @@ export function buildLobbyEmbed(
         inline: false,
       }
     )
-    .setFooter({ text: `Host: ${hostTag} • Min 2 players required` })
+    .setFooter({ text: `Host: ${hostTag} • Ugu yaraan 2 ciyaartooy ayaa loo baahan yahay` })
     .setTimestamp();
 }
 
-export function buildLobbyButtons(
-  hostId: string,
-  interactorId?: string
-): ActionRowBuilder<ButtonBuilder> {
-  const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
+export function buildLobbyButtons(): ActionRowBuilder<ButtonBuilder> {
+  return new ActionRowBuilder<ButtonBuilder>().addComponents(
     new ButtonBuilder()
       .setCustomId("join_game")
-      .setLabel("Join")
+      .setLabel("Ku biir")
       .setEmoji("✅")
       .setStyle(ButtonStyle.Success),
     new ButtonBuilder()
       .setCustomId("leave_game")
-      .setLabel("Leave")
+      .setLabel("Ka bax")
       .setEmoji("🚪")
       .setStyle(ButtonStyle.Secondary),
     new ButtonBuilder()
       .setCustomId("start_game")
-      .setLabel("Start Now")
+      .setLabel("Bilaab hadda")
       .setEmoji("▶️")
       .setStyle(ButtonStyle.Primary),
     new ButtonBuilder()
       .setCustomId("stop_game")
-      .setLabel("Cancel")
+      .setLabel("Jooji")
       .setEmoji("⛔")
       .setStyle(ButtonStyle.Danger)
   );
-  return row;
 }
 
 export function buildBetButtons(): ActionRowBuilder<ButtonBuilder>[] {
-  const bets = [500, 1000, 2000, 3000, 4000, 5000];
+  const bets = [500, 1_000, 2_000, 3_000, 4_000, 5_000];
   // Discord max 5 buttons per row — split 6 bets into two rows (3 + 3)
   const row1 = new ActionRowBuilder<ButtonBuilder>();
   const row2 = new ActionRowBuilder<ButtonBuilder>();
   bets.forEach((b, i) => {
     const btn = new ButtonBuilder()
       .setCustomId(`bet_${b}`)
-      .setLabel(`${b.toLocaleString()}`)
+      .setLabel(`$${b.toLocaleString()}`)
       .setEmoji("💵")
       .setStyle(ButtonStyle.Secondary);
     if (i < 3) row1.addComponents(btn);
@@ -118,174 +113,148 @@ export function buildBetButtons(): ActionRowBuilder<ButtonBuilder>[] {
   return [row1, row2];
 }
 
-// ─── Game Start Embed ────────────────────────────────────────────────────────
+// ─── Game Board Embed (the ONE embed used throughout the whole game) ──────────
+//
+// lastActionText: e.g. "✅ Ahmed badbaday!" or "💥 Mohamed dab buu ku dhacay!"
+// turnEndsAt is read from game.turnEndsAt (ms unix timestamp)
 
-export function buildGameStartEmbed(game: GameState): EmbedBuilder {
-  const playerList = game.players
-    .map((p) => `> 👤 **${p.displayName}** — $${p.bet.toLocaleString()}`)
-    .join("\n");
-
-  return new EmbedBuilder()
-    .setTitle("💣  BOMB SURVIVAL  —  STARTED!")
-    .setColor(ORANGE_COLOR)
-    .setDescription(
-      `The bombs are hidden. Choose your tiles wisely.\n\n${playerList}`
-    )
-    .addFields(
-      {
-        name: "👥 Players",
-        value: `\`${game.players.length}\``,
-        inline: true,
-      },
-      {
-        name: "💰 Prize Pool",
-        value: `\`$${game.prizePool.toLocaleString()}\``,
-        inline: true,
-      },
-      {
-        name: "💣 Bombs",
-        value: `\`${game.bombCount}\``,
-        inline: true,
-      },
-      {
-        name: "\u200b",
-        value: "🍀  **Good Luck Everyone!**",
-        inline: false,
-      }
-    )
-    .setTimestamp();
-}
-
-// ─── Game Board Embed ────────────────────────────────────────────────────────
-
-export function buildGameBoardEmbed(game: GameState): EmbedBuilder {
+export function buildGameBoardEmbed(
+  game: GameState,
+  lastActionText?: string
+): EmbedBuilder {
   const currentPlayerId = game.activePlayers[game.currentPlayerIndex];
-  const currentPlayer = game.players.find((p) => p.userId === currentPlayerId);
-  const remaining = game.activePlayers.length;
-  const foundBombs = game.tiles.filter((t) => t.revealed && t.isBomb).length;
-  const bombsLeft = game.bombCount - foundBombs;
+  const currentPlayer   = game.players.find((p) => p.userId === currentPlayerId);
+  const nextIndex       = (game.currentPlayerIndex + 1) % game.activePlayers.length;
+  const nextPlayerId    = game.activePlayers[nextIndex];
+  const nextPlayer      = game.activePlayers.length > 1
+    ? game.players.find((p) => p.userId === nextPlayerId)
+    : null;
 
-  const playerStatusLines = game.activePlayers.map((uid, i) => {
-    const p = game.players.find((x) => x.userId === uid)!;
+  const remaining  = game.activePlayers.length;
+  const foundBombs = game.tiles.filter((t) => t.revealed && t.isBomb).length;
+  const bombsLeft  = game.bombCount - foundBombs;
+
+  // Discord auto-updating countdown: <t:UNIX_SECONDS:R>
+  const countdownStr = game.turnEndsAt
+    ? `<t:${Math.floor(game.turnEndsAt / 1_000)}:R>`
+    : "";
+
+  // Description: last result + whose turn it is
+  let desc = "";
+  if (lastActionText) desc += `${lastActionText}\n\n`;
+  if (currentPlayer) {
+    desc += `🎯 **${currentPlayer.displayName}** — Doorso tile!\n`;
+    if (countdownStr) desc += `⏱️ Dhamaadka: ${countdownStr}`;
+    if (nextPlayer) desc += `\n➡️ Xiga: **${nextPlayer.displayName}**`;
+  }
+
+  // Player list: ▶️ = current turn, ⬛ = waiting
+  const playerLines = game.activePlayers.map((uid, i) => {
+    const p     = game.players.find((x) => x.userId === uid)!;
     const arrow = i === game.currentPlayerIndex ? "▶️" : "⬛";
-    return `${arrow} **${p.displayName}**`;
+    return `${arrow} **${p.displayName}** — $${p.bet.toLocaleString()}`;
   });
 
   return new EmbedBuilder()
-    .setTitle("💣  BOMB SURVIVAL  —  IN PROGRESS")
+    .setTitle("💣  BOMB SURVIVAL")
     .setColor(DARK_COLOR)
+    .setDescription(desc || "\u200b")
     .addFields(
       {
-        name: "👥 Players Remaining",
-        value: `\`${remaining}\``,
+        name: "👥 Ciyaartoyda",
+        value: `\`${remaining} badbaaday\``,
         inline: true,
       },
       {
-        name: "💰 Prize Pool",
+        name: "💰 Abaalmarinta",
         value: `\`$${game.prizePool.toLocaleString()}\``,
         inline: true,
       },
       {
-        name: "💣 Bombs Hidden",
-        value: `\`${bombsLeft} left\``,
+        name: "💣 Dabab",
+        value: `\`${bombsLeft} badbaaday\``,
         inline: true,
       },
       {
-        name: "⏳ Current Turn",
-        value: currentPlayer
-          ? `**${currentPlayer.displayName}** — pick a tile! *(10s)*`
-          : "—",
-        inline: false,
-      },
-      {
-        name: "🎮 Players",
-        value: playerStatusLines.join("\n") || "—",
+        name: "🎮 Ciyaartoyda",
+        value: playerLines.join("\n") || "—",
         inline: false,
       }
     )
-    .setFooter({
-      text: "Click a tile! If time runs out the bot picks for you.",
-    })
+    .setFooter({ text: "Doorso tile! Haddaadan doorsan bot ayaa kuu doorta." })
     .setTimestamp();
 }
+
+// ─── Tile Buttons (with current-player header row) ────────────────────────────
 
 export function buildTileButtons(
   game: GameState
 ): ActionRowBuilder<ButtonBuilder>[] {
+  const currentPlayerId = game.activePlayers[game.currentPlayerIndex];
+  const currentPlayer   = game.players.find((p) => p.userId === currentPlayerId);
+
   const rows: ActionRowBuilder<ButtonBuilder>[] = [];
-  const tiles = game.tiles;
   const COLS = 5;
 
+  // Header row — shows whose turn it is (disabled, acts as a label)
+  const headerRow = new ActionRowBuilder<ButtonBuilder>().addComponents(
+    new ButtonBuilder()
+      .setCustomId("turn_header")
+      .setLabel(
+        currentPlayer
+          ? `🎯 ${currentPlayer.displayName} — Doorso!`
+          : "🎯 Wareegga"
+      )
+      .setStyle(ButtonStyle.Primary)
+      .setDisabled(true)
+  );
+  rows.push(headerRow);
+
+  // Tile rows (max 4 rows × 5 cols = 20 tiles, + 1 header = 5 rows total ✓)
+  const tiles = game.tiles;
   for (let i = 0; i < tiles.length; i += COLS) {
-    const row = new ActionRowBuilder<ButtonBuilder>();
+    const row   = new ActionRowBuilder<ButtonBuilder>();
     const chunk = tiles.slice(i, i + COLS);
     for (const tile of chunk) {
       const btn = new ButtonBuilder().setCustomId(`tile_${tile.index}`);
       if (!tile.revealed) {
-        btn
-          .setLabel("❓")
-          .setStyle(ButtonStyle.Secondary)
-          .setDisabled(false);
+        btn.setLabel("❓").setStyle(ButtonStyle.Secondary).setDisabled(false);
       } else if (tile.isBomb) {
-        btn
-          .setLabel("💣")
-          .setStyle(ButtonStyle.Danger)
-          .setDisabled(true);
+        btn.setLabel("💣").setStyle(ButtonStyle.Danger).setDisabled(true);
       } else {
-        btn
-          .setLabel("✅")
-          .setStyle(ButtonStyle.Success)
-          .setDisabled(true);
+        btn.setLabel("✅").setStyle(ButtonStyle.Success).setDisabled(true);
       }
       row.addComponents(btn);
     }
     rows.push(row);
   }
+
   return rows;
-}
-
-// ─── Bomb Hit Embed ──────────────────────────────────────────────────────────
-
-export function buildBombHitEmbed(
-  playerName: string,
-  game: GameState
-): EmbedBuilder {
-  return new EmbedBuilder()
-    .setTitle("💥  BOOM!")
-    .setColor(BOMB_COLOR)
-    .setDescription(
-      `**${playerName}** hit a bomb and has been eliminated!\n\n💣 **${game.activePlayers.length} players** remaining.`
-    )
-    .setTimestamp();
-}
-
-// ─── Safe Tile Embed ─────────────────────────────────────────────────────────
-
-export function buildSafeEmbed(playerName: string): EmbedBuilder {
-  return new EmbedBuilder()
-    .setTitle("✅  SAFE!")
-    .setColor(GREEN_COLOR)
-    .setDescription(`**${playerName}** survived! Turn passes to the next player.`)
-    .setTimestamp();
 }
 
 // ─── Final Two Embed ─────────────────────────────────────────────────────────
 
-export function buildFinalTwoEmbed(game: GameState): EmbedBuilder {
+export function buildFinalTwoEmbed(
+  game: GameState,
+  lastActionText?: string
+): EmbedBuilder {
   const [p1id, p2id] = game.activePlayers;
   const p1 = game.players.find((p) => p.userId === p1id);
   const p2 = game.players.find((p) => p.userId === p2id);
 
+  let desc = "";
+  if (lastActionText) desc += `${lastActionText}\n\n`;
+  desc +=
+    `⚡ **${p1?.displayName}** vs **${p2?.displayName}**!\n\n` +
+    `Mid walba waa inuu doorto: 💣 **Dab** ama 🟢 **Badbaado**.\n` +
+    `Hore u riix — adigu ayaa nasiibkaaga go'aamiya!`;
+
   return new EmbedBuilder()
-    .setTitle("⚡  FINAL SHOWDOWN — 2 Players Left!")
+    .setTitle("⚡  DAGAALKA UGU DAMBEEYA — 2 Ciyaartooy!")
     .setColor(GOLD_COLOR)
-    .setDescription(
-      `It comes down to **${p1?.displayName}** vs **${p2?.displayName}**!\n\n` +
-        `Each player must choose: 💣 **Bomb** or 🟢 **Safe**.\n` +
-        `Whoever clicks first decides their fate. Choose wisely!`
-    )
+    .setDescription(desc)
     .addFields({
-      name: "💰 Prize Pool",
+      name: "💰 Abaalmarinta",
       value: `\`$${game.prizePool.toLocaleString()}\``,
       inline: true,
     })
@@ -296,12 +265,12 @@ export function buildFinalTwoButtons(): ActionRowBuilder<ButtonBuilder> {
   return new ActionRowBuilder<ButtonBuilder>().addComponents(
     new ButtonBuilder()
       .setCustomId("final_bomb")
-      .setLabel("Bomb")
+      .setLabel("Dab")
       .setEmoji("💣")
       .setStyle(ButtonStyle.Danger),
     new ButtonBuilder()
       .setCustomId("final_safe")
-      .setLabel("Safe")
+      .setLabel("Badbaado")
       .setEmoji("🟢")
       .setStyle(ButtonStyle.Success)
   );
@@ -311,32 +280,53 @@ export function buildFinalTwoButtons(): ActionRowBuilder<ButtonBuilder> {
 
 export function buildWinnerEmbed(
   winnerName: string,
-  prize: number
+  prize: number,
+  newBalance: number
 ): EmbedBuilder {
   return new EmbedBuilder()
-    .setTitle("🏆  WINNER!")
+    .setTitle("🏆  GUULEYSTAY!")
     .setColor(GOLD_COLOR)
     .setDescription(
-      `> 👑  **${winnerName}**\n> 🏆  *Last Survivor*\n\n` +
-        `💰  **Prize Won: $${prize.toLocaleString()}**\n\n` +
-        `**Congratulations!** 🎉`
+      `> 👑  **${winnerName}**\n> 🏆  *Midka ugu dambeeyay ee badbaaday*\n\n` +
+        `💰  **Abaalmarinta: $${prize.toLocaleString()}**\n` +
+        `🏦  **Buuxi cusub: $${newBalance.toLocaleString()}**\n\n` +
+        `**Hambalyo! 🎉**`
     )
     .setTimestamp();
 }
 
-// ─── Timeout Embed ───────────────────────────────────────────────────────────
+// ─── Disabled lobby buttons (shown after game starts) ─────────────────────────
 
-export function buildTimeoutEmbed(playerName: string): EmbedBuilder {
-  return new EmbedBuilder()
-    .setTitle("⏰  Time's Up!")
-    .setColor(ORANGE_COLOR)
-    .setDescription(
-      `**${playerName}** didn't pick in time — the bot chose a random tile!`
-    )
-    .setTimestamp();
+export function disabledLobbyButtons(): ActionRowBuilder<ButtonBuilder> {
+  return new ActionRowBuilder<ButtonBuilder>().addComponents(
+    new ButtonBuilder()
+      .setCustomId("join_game_d")
+      .setLabel("Ku biir")
+      .setEmoji("✅")
+      .setStyle(ButtonStyle.Success)
+      .setDisabled(true),
+    new ButtonBuilder()
+      .setCustomId("leave_game_d")
+      .setLabel("Ka bax")
+      .setEmoji("🚪")
+      .setStyle(ButtonStyle.Secondary)
+      .setDisabled(true),
+    new ButtonBuilder()
+      .setCustomId("start_game_d")
+      .setLabel("Bilaab hadda")
+      .setEmoji("▶️")
+      .setStyle(ButtonStyle.Primary)
+      .setDisabled(true),
+    new ButtonBuilder()
+      .setCustomId("stop_game_d")
+      .setLabel("Jooji")
+      .setEmoji("⛔")
+      .setStyle(ButtonStyle.Danger)
+      .setDisabled(true)
+  );
 }
 
-// ─── Disabled Board (game over) ──────────────────────────────────────────────
+// ─── Disabled tile board (game over state) ───────────────────────────────────
 
 export function buildDisabledTileButtons(
   game: GameState
@@ -363,35 +353,4 @@ export function buildDisabledTileButtons(
     rows.push(row);
   }
   return rows;
-}
-
-// ─── Utility ─────────────────────────────────────────────────────────────────
-
-export function disabledLobbyButtons(): ActionRowBuilder<ButtonBuilder> {
-  return new ActionRowBuilder<ButtonBuilder>().addComponents(
-    new ButtonBuilder()
-      .setCustomId("join_game_d")
-      .setLabel("Join")
-      .setEmoji("✅")
-      .setStyle(ButtonStyle.Success)
-      .setDisabled(true),
-    new ButtonBuilder()
-      .setCustomId("leave_game_d")
-      .setLabel("Leave")
-      .setEmoji("🚪")
-      .setStyle(ButtonStyle.Secondary)
-      .setDisabled(true),
-    new ButtonBuilder()
-      .setCustomId("start_game_d")
-      .setLabel("Start Now")
-      .setEmoji("▶️")
-      .setStyle(ButtonStyle.Primary)
-      .setDisabled(true),
-    new ButtonBuilder()
-      .setCustomId("stop_game_d")
-      .setLabel("Cancel")
-      .setEmoji("⛔")
-      .setStyle(ButtonStyle.Danger)
-      .setDisabled(true)
-  );
 }

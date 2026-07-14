@@ -36,11 +36,12 @@ export async function handleBomb(message: Message): Promise<void> {
     activePlayers: [],
     finalTwoChosen: {},
     turnStartedAt: Date.now(),
+    turnEndsAt: 0,
   };
 
   const lobbyMsg = await (message.channel as TextChannel).send({
     embeds: [buildLobbyEmbed([], MAX_PLAYERS, hostTag)],
-    components: [buildLobbyButtons(hostId)],
+    components: [buildLobbyButtons()],
   });
 
   game.messageId = lobbyMsg.id;
