@@ -1,0 +1,287 @@
+Waxaan rabaa Discord bot game cusub oo la yiraahdo Bomb Survival. Waa game ku saleysan nasiib iyo lacag (Economy). Game-ku wuxuu ka dhacayaa hal channel, mana jiro DM.
+👥 Players
+	•	Ugu yar: 2 Players
+	•	Ugu badan: 13 players 
+
+Game-ku ma bilaaban karo ilaa ay ugu yaraan 2 qof ku biiraan.
+
+🚀 Start Game
+
+Host-ku wuxuu qorayaa:
+
+!bomb
+
+Bot-ku wuxuu soo dirayaa embed casri ah.
+
+Embed
+
+💣 Bomb Survival
+
+👥 Players: 0/8
+
+💰 Prize Pool: $0
+
+💣 Bombs: Random (2 ama 3)
+
+⏳ Waiting for Players…
+
+Hoosta embed-ka waxaa yaalla 3 buttons oo keliya.
+
+Ku biir        game-ka.
+Ka bax     game-ka.
+bilaaab hadda         Host-ka oo keliya ayaa bilaabi kara game-ka.
+Jooji.          Ciyaarta Jooji host kaliya sameen Kara 
+
+💰 Bet System
+
+Marka player-ku riixo Join, bot-ku ha tuso buttons-ka lacagta, modal lama isticmaalayo.
+
+Buttons-ka:
+
+💵 $500
+
+💵 $1000
+
+💵 $2000
+
+💵 $3000
+
+💵 $4000
+
+💵 $5000
+
+Dhammaan buttons-ka ha noqdaan
+
+Player-ku wuxuu riixayaa lacagta uu rabo inuu ku ciyaaro.
+
+Bot-ku waa inuu hubiyaa wallet-ka.
+
+Haddii lacagtu ku filan tahay:
+	•	Lacagta ha laga jaro wallet-ka.
+	•	Player-ka ha lagu daro game-ka.
+	•	Prize Pool ha is cusboonaado.
+
+Haddii lacagtu ku filnaan waydo:
+
+❌ You don't have enough money.
+
+📊 Lobby Update
+
+Mar kasta oo player cusub ku biiro, embed-ku ha is cusboonaado.
+
+Tusaale:
+
+👤 Mohamed — $500
+
+👤 Ahmed — $1000
+
+👤 Ali — $2000
+
+💰 Prize Pool: $3500
+
+👥 Players: 3/8
+
+▶️ Start
+
+Host-ku markuu riixo Start, bot-ku ha hubiyo:
+	•	Ugu yaraan 2 players.
+	•	Haddii aysan joogin, game-ka yuusan bilaaban.
+
+Haddii ay diyaar yihiin:
+
+💣 Bomb Survival Started!
+
+👥 Players: 6
+
+💰 Prize Pool: $9,000
+
+💣 Bombs: 3
+
+Good Luck Everyone!
+
+🎮 Gameplay
+
+Waxaan rabaa board qurux badan oo 10 tiles leh.
+
+Tiles-ku waa isku muuqaal, mana laha numbers.
+
+Bot-ku random ayuu u qarinayaa:
+	•	💣 2 ama 3 Bombs
+	•	Tiles-ka kale waa Safe.
+
+Qofna ma ogaan karo meesha Bomb-ku yaal.
+
+⏳ Turn System
+
+Player kasta wuxuu leeyahay 10 ilbiriqsi.
+
+Bot-ku wuxuu sheegayaa markiisa wuxu hoos bottens ugu soo qoraya magaciisa iyo second space saaid uwenen jirin laakin fahmi karo
+
+Haddii waqtigu dhammaado:
+
+Bot-ku random ayuu ugu dooranayaa hal tile.
+
+💣 Bomb
+
+
+Haddii Bomb la helo:
+Botten uu doorto wa in bomb uu noqdaa Haddii save noqoto cagaar inuu ubadalmo botten 
+
+Hadii uuku dhaco Player-ka waa laga saarayaa game-ka.
+
+Turn-ku wuxuu u gudbayaa player-ka xiga
+
+🏆 Winner
+
+Marka hal player oo keliya soo haro:
+
+👑 WINNER
+
+Mohamed
+
+🏆 Last Survivor
+
+💰 Prize Won: $4,500
+
+Congratulations!
+
+Lacagta guusha si toos ah ha loogu daro wallet-kiisa.
+
+🎨 UI Design
+
+⸻
+
+Tiles iyo Bombs ha noqdaan sidan:
+	•	2–4 Players → 10 Tiles → 2–3 Bombs
+	•	5–6 Players → 12 Tiles → 4 Bombs
+	•	7–8 Players → 14 Tiles → 6 Bombs
+	•	9–11 Players → 16 Tiles → 8 Bombs
+	•	12–13 Players → 18 Tiles → 10 Bombs
+
+Bombs-ka waa inay noqdaan Random si ciyaar kasta uga duwanaato tii hore.
+
+⸻
+
+🎁 Daily Reward Command
+
+Ku dar command cusub:
+
+!daily
+ kasta wuxuu isticmaali karaa 24 saacadoodkiiba hal mar.
+	•	Haddii uu isku dayo ka hor 24 saac, bot-ku waa inuu tusaa waqtiga ka haray.
+
+Lucky Rewards
+
+!daily waa nasiib (Random).
+
+Waxaa ka soo bixi kara:
+	•	❌ Lose $500
+	•	💵 Win $500
+	•	💵 Win $1,000
+	•	💵 Win $2,000
+	•	💵 Win $3,000
+	•	💵 Win $4,000
+	•	💵 Win $5,000
+	•	💰 Jackpot $10,000
+
+Chance System
+
+Waxaan rabaa dadka badankood inay helaan:
+	•	$500
+	•	$1,000
+
+$10,000 ha noqoto mid aad u naadir ah.
+
+💼 Work Command
+
+Ku dar command:
+!work
+•	Player kasta wuxuu isticmaali karaa 2 saac kasta hal mar.
+	•	Wuxuu helayaa $500.
+
+Haddii uu isku dayo waqtiga ka horreeya:
+
+Bot-ku ha yiraahdo:
+
+⏳ You have already worked.
+
+Time Remaining: 43 Minutes 21 Seconds
+
+Waqtiga haray si sax ah ha loo muujiyo.
+
+🏆 Final Two Players
+
+Marka Bombs dhammato  oo 2 Players soo harto in lacagaha lakala qeebsanin raba uu hal player dhamman lacgta uu qaato 
+
+Game-ku yuusan si toos ah u dhammaan.
+
+Labada player waxaa loo soo bandhigayaa laba button:
+
+💣 Bomb
+
+🟢 Safe
+
+Tusale player axmad wuxu doortay bombs botten automatically waa in qofka kale uu lacagta uu qaataa prize pool 
+
+Natiijo
+
+Haddii hal player doorto Bomb, kan kalena Safe:
+	•	🏆 Safe Player wins.
+	•	Wuxuu qaadanayaa Prize Pool-ka oo dhan.
+
+🏦 Tax System
+
+Ku dar nidaam canshuur.
+
+Player kasta oo leh $25,000 ama ka badan wallet-kiisa.
+
+Bot-ku waa inuu 3 maalmood kasta si automatic ah uga jaraa:
+
+💸 $2,500 Tax
+
+Bot-ku ha diro DM ama notification:
+
+🏦 Tax Collected
+
+$2,500 has been deducted from your wallet.
+
+Reason: Automatic 3-Day Tax.
+
+sidoo kle waxa igu dartaa !givecash kabacdi userka kabacdi lacagta
+
+qofka markiisa ugu horeyso neh sii 5000$
+
+commnds !bomb iyo !givecash !balance uu lacagta uuku ogaan karo
+qofka balance giisa fiirinayo markuu lacgtiisa eber tahy in loosoo qoro
+haragaga kuguma filno lacagta fadlan lacag ku shubo
+
+Sidoo embed botten waa in halmar uu soo dhacaa qofka kale markey mareeso wuxu ku ogaaan karaaa magaciisa meesha kor kasoo baxayo 
+
+balance	Qof walba
+
+!givecash @user amount	Qof walba (lacagtaada oo keliya)
+
+!deduct @user amount	Bot Owner oo keliya
+(Player walbo Lacag Ayuu ka Jari karaa )
+
+!bomb	Qof walba (game bilaab)
+
+!grant @user amount	Bot Owner oo keliya
+(players walbo Lacag ayuu ugu dari kara lacag aan xad laheen )
+
+
+Waxaan rabaa:
+	•	✨ Embeds casri ah.
+	•	🎮 Buttons nadiif ah.
+	•	⚫ Bet buttons oo madow (Secondary).
+	•	👥 Live player count.
+	•	💰 Live prize pool.
+	•	⏳ Countdown timer.
+	•	💥 Bomb animation/message.
+	•	🏆 Winner embed qurux badan.
+
+⭐ Extra Features
+	•	Bombs-ku ha noqdaan random (2 ama 3) si ciyaar walba uga duwanaato tii hore.
+	•	Bot-ku ha muujiyo players-ka haray bottens kor 
+
+	•	Game-ku ha noqdo mid degdeg ah, qurux badan, oo dadka ku dhiirrigeliya inay marar badan ciyaaraan si ay ugu guuleystaan lacagta Prize Pool-ka.
