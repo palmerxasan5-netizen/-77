@@ -11,8 +11,8 @@ export async function handleBalance(message: Message): Promise<void> {
     .setColor(balance === 0 ? 0xff2222 : 0x00c853)
     .setDescription(
       balance === 0
-        ? `> ❌ Your wallet is empty!\n> *You don't have enough money — please top up.*`
-        : `> 💰  **$${balance.toLocaleString()}**`
+        ? `> 💸 Lacagtaadu waxay tahay **$0**\n> *Fadlan lacag ku shubo!*`
+        : `> 💰  **${balance.toLocaleString()}**`
     )
     .setFooter({ text: `${message.author.username}` })
     .setTimestamp();

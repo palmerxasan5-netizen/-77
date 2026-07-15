@@ -8,7 +8,6 @@ import { logger } from "../lib/logger.js";
 import { handleButtonInteraction } from "./interactions.js";
 import { handleBomb } from "./handlers/bomb.js";
 import { handleBalance } from "./handlers/balance.js";
-import { handleDaily } from "./handlers/daily.js";
 import { handleWork } from "./handlers/work.js";
 import { handleGiveCash } from "./handlers/givecash.js";
 import { handleGrant } from "./handlers/grant.js";
@@ -55,9 +54,6 @@ export function startBot(): void {
         case "balance":
         case "bal":
           await handleBalance(message);
-          break;
-        case "daily":
-          await handleDaily(message);
           break;
         case "work":
           await handleWork(message);

@@ -115,20 +115,15 @@ export function buildBetButtons(): ActionRowBuilder<ButtonBuilder>[] {
 
 // ─── Game Board Embed (the ONE embed used throughout the whole game) ──────────
 //
-// lastActionText: e.g. "✅ Ahmed badbaday!" or "💥 Mohamed dab buu ku dhacay!"
+// lastResult: 'bomb' | 'safe' — shown as tile emoji (💣 / ✅), no text sentences
 // turnEndsAt is read from game.turnEndsAt (ms unix timestamp)
 
 export function buildGameBoardEmbed(
   game: GameState,
-  lastActionText?: string
+  lastResult?: "bomb" | "safe" | null
 ): EmbedBuilder {
   const currentPlayerId = game.activePlayers[game.currentPlayerIndex];
   const currentPlayer   = game.players.find((p) => p.userId === currentPlayerId);
-  const nextIndex       = (game.currentPlayerIndex + 1) % game.activePlayers.length;
-  const nextPlayerId    = game.activePlayers[nextIndex];
-  const nextPlayer      = game.activePlayers.length > 1
-    ? game.players.find((p) => p.userId === nextPlayerId)
-    : null;
 
   const remaining  = game.activePlayers.length;
   const foundBombs = game.tiles.filter((t) => t.revealed && t.isBomb).length;
@@ -139,21 +134,15 @@ export function buildGameBoardEmbed(
     ? `<t:${Math.floor(game.turnEndsAt / 1_000)}:R>`
     : "";
 
-  // Description: last result + whose turn it is
+  // Description: current player + countdown + last result shown as tile emoji
   let desc = "";
-  if (lastActionText) desc += `${lastActionText}\n\n`;
   if (currentPlayer) {
     desc += `🎯 **${currentPlayer.displayName}** — Doorso tile!\n`;
     if (countdownStr) desc += `⏱️ Dhamaadka: ${countdownStr}`;
-    if (nextPlayer) desc += `\n➡️ Xiga: **${nextPlayer.displayName}**`;
   }
-
-  // Player list: ▶️ = current turn, ⬛ = waiting
-  const playerLines = game.activePlayers.map((uid, i) => {
-    const p     = game.players.find((x) => x.userId === uid)!;
-    const arrow = i === game.currentPlayerIndex ? "▶️" : "⬛";
-    return `${arrow} **${p.displayName}** — $${p.bet.toLocaleString()}`;
-  });
+  if (lastResult != null) {
+    desc += `\n\n${lastResult === "bomb" ? "💣" : "✅"}`;
+  }
 
   return new EmbedBuilder()
     .setTitle("💣  BOMB SURVIVAL")
@@ -167,21 +156,16 @@ export function buildGameBoardEmbed(
       },
       {
         name: "💰 Abaalmarinta",
-        value: `\`$${game.prizePool.toLocaleString()}\``,
+        value: `\`${game.prizePool.toLocaleString()}\``,
         inline: true,
       },
       {
-        name: "💣 Dabab",
+        name: "💣 Bomb",
         value: `\`${bombsLeft} badbaaday\``,
         inline: true,
-      },
-      {
-        name: "🎮 Ciyaartoyda",
-        value: playerLines.join("\n") || "—",
-        inline: false,
       }
     )
-    .setFooter({ text: "Doorso tile! Haddaadan doorsan bot ayaa kuu doorta." })
+    .setFooter({ text: "❓ aan la garanin  •  💣 dab  •  ✅ badbaado" })
     .setTimestamp();
 }
 
@@ -196,16 +180,16 @@ export function buildTileButtons(
   const rows: ActionRowBuilder<ButtonBuilder>[] = [];
   const COLS = 5;
 
-  // Header row — shows whose turn it is (disabled, acts as a label)
+  // Header row — shows whose turn it is (disabled label row)
   const headerRow = new ActionRowBuilder<ButtonBuilder>().addComponents(
     new ButtonBuilder()
       .setCustomId("turn_header")
       .setLabel(
         currentPlayer
-          ? `🎯 ${currentPlayer.displayName} — Doorso!`
-          : "🎯 Wareegga"
+          ? `▶  ${currentPlayer.displayName}`
+          : "▶  Wareegga"
       )
-      .setStyle(ButtonStyle.Primary)
+      .setStyle(ButtonStyle.Secondary)
       .setDisabled(true)
   );
   rows.push(headerRow);
@@ -236,14 +220,14 @@ export function buildTileButtons(
 
 export function buildFinalTwoEmbed(
   game: GameState,
-  lastActionText?: string
+  lastResult?: "bomb" | "safe" | null
 ): EmbedBuilder {
   const [p1id, p2id] = game.activePlayers;
   const p1 = game.players.find((p) => p.userId === p1id);
   const p2 = game.players.find((p) => p.userId === p2id);
 
   let desc = "";
-  if (lastActionText) desc += `${lastActionText}\n\n`;
+  if (lastResult != null) desc += `${lastResult === "bomb" ? "💣" : "✅"}\n\n`;
   desc +=
     `⚡ **${p1?.displayName}** vs **${p2?.displayName}**!\n\n` +
     `Mid walba waa inuu doorto: 💣 **Dab** ama 🟢 **Badbaado**.\n` +
@@ -255,7 +239,7 @@ export function buildFinalTwoEmbed(
     .setDescription(desc)
     .addFields({
       name: "💰 Abaalmarinta",
-      value: `\`$${game.prizePool.toLocaleString()}\``,
+      value: `\`${game.prizePool.toLocaleString()}\``,
       inline: true,
     })
     .setTimestamp();
@@ -280,16 +264,14 @@ export function buildFinalTwoButtons(): ActionRowBuilder<ButtonBuilder> {
 
 export function buildWinnerEmbed(
   winnerName: string,
-  prize: number,
-  newBalance: number
+  prize: number
 ): EmbedBuilder {
   return new EmbedBuilder()
     .setTitle("🏆  GUULEYSTAY!")
     .setColor(GOLD_COLOR)
     .setDescription(
       `> 👑  **${winnerName}**\n> 🏆  *Midka ugu dambeeyay ee badbaaday*\n\n` +
-        `💰  **Abaalmarinta: $${prize.toLocaleString()}**\n` +
-        `🏦  **Buuxi cusub: $${newBalance.toLocaleString()}**\n\n` +
+        `💰  **Abaalmarinta: ${prize.toLocaleString()}**\n\n` +
         `**Hambalyo! 🎉**`
     )
     .setTimestamp();

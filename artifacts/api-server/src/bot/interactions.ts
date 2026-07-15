@@ -21,7 +21,6 @@ import {
   buildFinalTwoEmbed,
   buildFinalTwoButtons,
   buildWinnerEmbed,
-  buildDisabledTileButtons,
   disabledLobbyButtons,
 } from "./embeds.js";
 import { addBalance, getBalance } from "./store.js";
@@ -112,9 +111,17 @@ async function handleBet(
   const bet     = parseInt(interaction.customId.replace("bet_", ""), 10);
   const balance = getBalance(interaction.user.id);
 
+  if (balance === 0) {
+    await interaction.reply({
+      content: `💸  Lacagtaadu waxay tahay **$0** — fadlan lacag ku shubo!`,
+      flags: 64,
+    });
+    return;
+  }
+
   if (balance < bet) {
     await interaction.reply({
-      content: `❌  Lacag kuma filna. Xisaabtaada: **$${balance.toLocaleString()}**`,
+      content: `❌  Lacag kuma filna. Xisaabtaada: **${balance.toLocaleString()}**`,
       flags: 64,
     });
     return;
@@ -237,7 +244,7 @@ async function handleStart(
 
   // Edit the lobby message in-place → becomes the game board (ONE message throughout)
   await interaction.update({
-    embeds:     [buildGameBoardEmbed(game, "🎮  **Ciyaarta bilaabatay! Dooro tile-kaaga!**")],
+    embeds:     [buildGameBoardEmbed(game, null)],
     components: buildTileButtons(game),
   });
 
@@ -306,33 +313,25 @@ export async function revealTile(
       game.currentPlayerIndex = 0;
     }
 
-    const lastAction = timedOut
-      ? `💥 **${currentPlayer.displayName}** waqtigu dhamaaday — bot ayaa u dooray: **DAB!** 💀`
-      : `💥 **${currentPlayer.displayName}** dab buu ku dhacay — wuu baxa! 💀`;
-
     if (game.activePlayers.length === 1) {
       setGame(channelId, game);
-      await endGame(channelId, client, lastAction);
+      await endGame(channelId, client, "bomb");
       return;
     }
 
     const foundBombs = game.tiles.filter((t) => t.isBomb && t.revealed).length;
     if (game.activePlayers.length === 2 && foundBombs >= game.bombCount) {
       setGame(channelId, game);
-      await startFinalShowdown(channelId, client, lastAction);
+      await startFinalShowdown(channelId, client, "bomb");
       return;
     }
 
     game.turnEndsAt = Date.now() + TURN_TIMEOUT_MS;
     setGame(channelId, game);
-    await updateBoardMessage(channelId, client, lastAction);
+    await updateBoardMessage(channelId, client, "bomb");
     startTurnTimer(channelId, client);
   } else {
     // ── Safe tile ──────────────────────────────────────────────────────────
-    const lastAction = timedOut
-      ? `⏰ **${currentPlayer.displayName}** waqtigu dhamaaday — bot ayaa u dooray: badbaado ✅`
-      : `✅ **${currentPlayer.displayName}** badbaday! Wareegga mid xiga.`;
-
     game.currentPlayerIndex =
       (game.currentPlayerIndex + 1) % game.activePlayers.length;
 
@@ -340,13 +339,13 @@ export async function revealTile(
 
     if (hiddenSafe === 0 && game.activePlayers.length > 1) {
       setGame(channelId, game);
-      await startFinalShowdown(channelId, client, lastAction);
+      await startFinalShowdown(channelId, client, "safe");
       return;
     }
 
     game.turnEndsAt = Date.now() + TURN_TIMEOUT_MS;
     setGame(channelId, game);
-    await updateBoardMessage(channelId, client, lastAction);
+    await updateBoardMessage(channelId, client, "safe");
     startTurnTimer(channelId, client);
   }
 }
@@ -377,7 +376,7 @@ function startTurnTimer(channelId: string, client: Client): void {
 async function updateBoardMessage(
   channelId: string,
   client: Client,
-  lastActionText?: string
+  lastResult?: "bomb" | "safe" | null
 ): Promise<void> {
   const game = getGame(channelId);
   if (!game) return;
@@ -388,7 +387,7 @@ async function updateBoardMessage(
   try {
     const msg = await ch.messages.fetch(game.messageId);
     await msg.edit({
-      embeds:     [buildGameBoardEmbed(game, lastActionText)],
+      embeds:     [buildGameBoardEmbed(game, lastResult)],
       components: buildTileButtons(game),
     });
   } catch (e) {
@@ -401,12 +400,12 @@ async function updateBoardMessage(
 async function startFinalShowdown(
   channelId: string,
   client: Client,
-  lastActionText?: string
+  lastResult?: "bomb" | "safe" | null
 ): Promise<void> {
   const game = getGame(channelId);
   if (!game) return;
 
-  game.phase         = "final_two";
+  game.phase          = "final_two";
   game.finalTwoChosen = {};
   setGame(channelId, game);
 
@@ -416,7 +415,7 @@ async function startFinalShowdown(
   try {
     const msg = await ch.messages.fetch(game.messageId);
     await msg.edit({
-      embeds:     [buildFinalTwoEmbed(game, lastActionText)],
+      embeds:     [buildFinalTwoEmbed(game, lastResult)],
       components: [buildFinalTwoButtons()],
     });
   } catch (e) {
@@ -451,10 +450,6 @@ async function handleFinalChoice(
   const [p1id, p2id] = game.activePlayers as [string, string];
   const otherId = interaction.user.id === p1id ? p2id : p1id;
 
-  const loserName  = choice === "bomb" ? chooser.displayName
-    : game.players.find((p) => p.userId === otherId)?.displayName ?? "?";
-  const lastAction = `💣 **${loserName}** dab ayuu doortay — wuu baxa! 💀`;
-
   if (choice === "bomb") {
     game.activePlayers = [otherId];
   } else {
@@ -468,7 +463,7 @@ async function handleFinalChoice(
     flags: 64,
   });
 
-  await endGame(channelId, client, lastAction);
+  await endGame(channelId, client, "bomb");
 }
 
 // ─── End Game ─────────────────────────────────────────────────────────────────
@@ -476,7 +471,7 @@ async function handleFinalChoice(
 async function endGame(
   channelId: string,
   client: Client,
-  lastAction?: string
+  _lastResult?: "bomb" | "safe" | null
 ): Promise<void> {
   const game = getGame(channelId);
   if (!game) return;
@@ -492,25 +487,14 @@ async function endGame(
 
   const winner = game.players.find((p) => p.userId === winnerId)!;
   addBalance(winnerId, game.prizePool);
-  const newBalance = getBalance(winnerId);
 
-  // Show winner by editing the single game message in-place
+  // Show winner by editing the single game message in-place (no balance shown)
   const ch = asSendable(client.channels.cache.get(channelId));
   if (ch) {
     try {
       const msg = await ch.messages.fetch(game.messageId);
       await msg.edit({
-        embeds: [
-          // If there was a last action (e.g. final bomb), show it above the winner card
-          ...(lastAction
-            ? [
-                new (await import("discord.js")).EmbedBuilder()
-                  .setColor(0xff2222)
-                  .setDescription(lastAction),
-              ]
-            : []),
-          buildWinnerEmbed(winner.displayName, game.prizePool, newBalance),
-        ],
+        embeds:     [buildWinnerEmbed(winner.displayName, game.prizePool)],
         components: [],
       });
     } catch (e) {
