@@ -10,6 +10,7 @@ const BOMB_COLOR  = 0xff2222;
 const GOLD_COLOR  = 0xffd700;
 const GREEN_COLOR = 0x00c853;
 const DARK_COLOR  = 0x2b2d31;
+const BLUE_COLOR  = 0x3b82f6;
 
 // ─── Lobby Embed ────────────────────────────────────────────────────────────
 
@@ -125,34 +126,41 @@ export function buildGameBoardEmbed(
   const currentPlayerId = game.activePlayers[game.currentPlayerIndex];
   const currentPlayer   = game.players.find((p) => p.userId === currentPlayerId);
 
-  const remaining  = game.activePlayers.length;
-  const foundBombs = game.tiles.filter((t) => t.revealed && t.isBomb).length;
-  const bombsLeft  = game.bombCount - foundBombs;
+  const foundBombs  = game.tiles.filter((t) => t.revealed && t.isBomb).length;
+  const bombsLeft   = game.bombCount - foundBombs;
+  const hiddenTiles = game.tiles.filter((t) => !t.revealed).length;
 
   // Discord auto-updating countdown: <t:UNIX_SECONDS:R>
   const countdownStr = game.turnEndsAt
     ? `<t:${Math.floor(game.turnEndsAt / 1_000)}:R>`
     : "";
 
-  // Description: current player + countdown + last result shown as tile emoji
+  // Description: name only + countdown + result emoji only
   let desc = "";
   if (currentPlayer) {
-    desc += `🎯 **${currentPlayer.displayName}** — Doorso tile!\n`;
-    if (countdownStr) desc += `⏱️ Dhamaadka: ${countdownStr}`;
+    desc += `**${currentPlayer.displayName}**`;
+    if (countdownStr) desc += `\n⏱️ ${countdownStr}`;
   }
   if (lastResult != null) {
     desc += `\n\n${lastResult === "bomb" ? "💣" : "✅"}`;
   }
 
+  // Active player names list
+  const playerLines = game.activePlayers
+    .map((id) => game.players.find((p) => p.userId === id))
+    .filter((p): p is NonNullable<typeof p> => !!p)
+    .map((p) => `> 👤 ${p.displayName}`)
+    .join("\n");
+
   return new EmbedBuilder()
     .setTitle("💣  BOMB SURVIVAL")
-    .setColor(DARK_COLOR)
+    .setColor(BLUE_COLOR)
     .setDescription(desc || "\u200b")
     .addFields(
       {
         name: "👥 Ciyaartoyda",
-        value: `\`${remaining} badbaaday\``,
-        inline: true,
+        value: playerLines || "\u200b",
+        inline: false,
       },
       {
         name: "💰 Abaalmarinta",
@@ -161,7 +169,7 @@ export function buildGameBoardEmbed(
       },
       {
         name: "💣 Bomb",
-        value: `\`${bombsLeft} badbaaday\``,
+        value: `\`💣 ${bombsLeft} hidden  •  ❓ ${hiddenTiles}\``,
         inline: true,
       }
     )
@@ -180,16 +188,12 @@ export function buildTileButtons(
   const rows: ActionRowBuilder<ButtonBuilder>[] = [];
   const COLS = 5;
 
-  // Header row — shows whose turn it is (disabled label row)
+  // Header row — shows whose turn it is (disabled label row, name only)
   const headerRow = new ActionRowBuilder<ButtonBuilder>().addComponents(
     new ButtonBuilder()
       .setCustomId("turn_header")
-      .setLabel(
-        currentPlayer
-          ? `▶  ${currentPlayer.displayName}`
-          : "▶  Wareegga"
-      )
-      .setStyle(ButtonStyle.Secondary)
+      .setLabel(currentPlayer ? currentPlayer.displayName : "Wareegga")
+      .setStyle(ButtonStyle.Primary)
       .setDisabled(true)
   );
   rows.push(headerRow);
