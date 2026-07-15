@@ -121,7 +121,8 @@ export function buildBetButtons(): ActionRowBuilder<ButtonBuilder>[] {
 
 export function buildGameBoardEmbed(
   game: GameState,
-  lastResult?: "bomb" | "safe" | null
+  lastResult?: "bomb" | "safe" | null,
+  lastPlayerName?: string
 ): EmbedBuilder {
   const currentPlayerId = game.activePlayers[game.currentPlayerIndex];
   const currentPlayer   = game.players.find((p) => p.userId === currentPlayerId);
@@ -135,14 +136,18 @@ export function buildGameBoardEmbed(
     ? `<t:${Math.floor(game.turnEndsAt / 1_000)}:R>`
     : "";
 
-  // Description: name only + countdown + result emoji only
+  // Description: "Name dooro" + countdown + result line with player name
   let desc = "";
   if (currentPlayer) {
-    desc += `**${currentPlayer.displayName}**`;
+    desc += `**${currentPlayer.displayName} dooro**`;
     if (countdownStr) desc += `\n⏱️ ${countdownStr}`;
   }
-  if (lastResult != null) {
-    desc += `\n\n${lastResult === "bomb" ? "💣" : "✅"}`;
+  if (lastResult != null && lastPlayerName) {
+    if (lastResult === "bomb") {
+      desc += `\n\n${lastPlayerName} wuu dhintay 💣`;
+    } else {
+      desc += `\n\n${lastPlayerName} waa save ✅`;
+    }
   }
 
   // Active player names list
@@ -224,14 +229,23 @@ export function buildTileButtons(
 
 export function buildFinalTwoEmbed(
   game: GameState,
-  lastResult?: "bomb" | "safe" | null
+  lastResult?: "bomb" | "safe" | null,
+  lastPlayerName?: string
 ): EmbedBuilder {
   const [p1id, p2id] = game.activePlayers;
   const p1 = game.players.find((p) => p.userId === p1id);
   const p2 = game.players.find((p) => p.userId === p2id);
 
   let desc = "";
-  if (lastResult != null) desc += `${lastResult === "bomb" ? "💣" : "✅"}\n\n`;
+  if (lastResult != null && lastPlayerName) {
+    if (lastResult === "bomb") {
+      desc += `${lastPlayerName} wuu dhintay 💣\n\n`;
+    } else {
+      desc += `${lastPlayerName} waa save ✅\n\n`;
+    }
+  } else if (lastResult != null) {
+    desc += `${lastResult === "bomb" ? "💣" : "✅"}\n\n`;
+  }
   desc +=
     `⚡ **${p1?.displayName}** vs **${p2?.displayName}**!\n\n` +
     `Mid walba waa inuu doorto: 💣 **Dab** ama 🟢 **Badbaado**.\n` +

@@ -306,6 +306,9 @@ export async function revealTile(
   const currentPlayerId = game.activePlayers[game.currentPlayerIndex]!;
   const currentPlayer   = game.players.find((p) => p.userId === currentPlayerId)!;
 
+  // Capture the acting player's name BEFORE index/array changes
+  const actingName = currentPlayer.displayName;
+
   if (tile.isBomb) {
     // ── Bomb hit ───────────────────────────────────────────────────────────
     game.activePlayers.splice(game.currentPlayerIndex, 1);
@@ -322,13 +325,13 @@ export async function revealTile(
     const foundBombs = game.tiles.filter((t) => t.isBomb && t.revealed).length;
     if (game.activePlayers.length === 2 && foundBombs >= game.bombCount) {
       setGame(channelId, game);
-      await startFinalShowdown(channelId, client, "bomb");
+      await startFinalShowdown(channelId, client, "bomb", actingName);
       return;
     }
 
     game.turnEndsAt = Date.now() + TURN_TIMEOUT_MS;
     setGame(channelId, game);
-    await updateBoardMessage(channelId, client, "bomb");
+    await updateBoardMessage(channelId, client, "bomb", actingName);
     startTurnTimer(channelId, client);
   } else {
     // ── Safe tile ──────────────────────────────────────────────────────────
@@ -339,13 +342,13 @@ export async function revealTile(
 
     if (hiddenSafe === 0 && game.activePlayers.length > 1) {
       setGame(channelId, game);
-      await startFinalShowdown(channelId, client, "safe");
+      await startFinalShowdown(channelId, client, "safe", actingName);
       return;
     }
 
     game.turnEndsAt = Date.now() + TURN_TIMEOUT_MS;
     setGame(channelId, game);
-    await updateBoardMessage(channelId, client, "safe");
+    await updateBoardMessage(channelId, client, "safe", actingName);
     startTurnTimer(channelId, client);
   }
 }
@@ -376,7 +379,8 @@ function startTurnTimer(channelId: string, client: Client): void {
 async function updateBoardMessage(
   channelId: string,
   client: Client,
-  lastResult?: "bomb" | "safe" | null
+  lastResult?: "bomb" | "safe" | null,
+  lastPlayerName?: string
 ): Promise<void> {
   const game = getGame(channelId);
   if (!game) return;
@@ -387,7 +391,7 @@ async function updateBoardMessage(
   try {
     const msg = await ch.messages.fetch(game.messageId);
     await msg.edit({
-      embeds:     [buildGameBoardEmbed(game, lastResult)],
+      embeds:     [buildGameBoardEmbed(game, lastResult, lastPlayerName)],
       components: buildTileButtons(game),
     });
   } catch (e) {
@@ -400,7 +404,8 @@ async function updateBoardMessage(
 async function startFinalShowdown(
   channelId: string,
   client: Client,
-  lastResult?: "bomb" | "safe" | null
+  lastResult?: "bomb" | "safe" | null,
+  lastPlayerName?: string
 ): Promise<void> {
   const game = getGame(channelId);
   if (!game) return;
@@ -415,7 +420,7 @@ async function startFinalShowdown(
   try {
     const msg = await ch.messages.fetch(game.messageId);
     await msg.edit({
-      embeds:     [buildFinalTwoEmbed(game, lastResult)],
+      embeds:     [buildFinalTwoEmbed(game, lastResult, lastPlayerName)],
       components: [buildFinalTwoButtons()],
     });
   } catch (e) {
