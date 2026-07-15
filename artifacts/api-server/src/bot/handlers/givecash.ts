@@ -5,29 +5,29 @@ import { getBalance, addBalance } from "../store.js";
 export async function handleGiveCash(message: Message, args: string[]): Promise<void> {
   const mention = message.mentions.users.first();
   if (!mention) {
-    await message.reply("❌  Usage: `!givecash @user amount`");
+    await message.reply("❌  Isticmaal: `!givecash @qof xad`");
     return;
   }
   if (mention.id === message.author.id) {
-    await message.reply("❌  You can't give money to yourself.");
+    await message.reply("❌  Nafta lacag iskuma siin kartid.");
     return;
   }
   if (mention.bot) {
-    await message.reply("❌  You can't give money to a bot.");
+    await message.reply("❌  Bot-ka lacag luma siin karo.");
     return;
   }
 
   const amountStr = args[1];
   const amount = amountStr ? parseInt(amountStr, 10) : NaN;
   if (isNaN(amount) || amount <= 0) {
-    await message.reply("❌  Please enter a valid positive amount. Example: `!givecash @user 500`");
+    await message.reply("❌  Xad sax ah geli. Tusaale: `!givecash @qof 500`");
     return;
   }
 
   const senderBalance = getBalance(message.author.id);
   if (senderBalance < amount) {
     await message.reply(
-      `❌  You don't have enough money. Your balance: **$${senderBalance.toLocaleString()}**`
+      `❌  Lacag kuma filna. Xisaabtaada: **$${senderBalance.toLocaleString()}**`
     );
     return;
   }
@@ -36,11 +36,11 @@ export async function handleGiveCash(message: Message, args: string[]): Promise<
   const receiverBalance = addBalance(mention.id, amount);
 
   const embed = new EmbedBuilder()
-    .setTitle("💸  Cash Sent!")
+    .setTitle("💸  Lacag La Diray!")
     .setColor(0x00c853)
     .setDescription(
-      `**${message.author.displayName}** sent **$${amount.toLocaleString()}** to **${mention.displayName}**!\n\n` +
-        `💼  **${mention.displayName}'s new balance: $${receiverBalance.toLocaleString()}**`
+      `**${message.author.displayName}** wuxuu u diray **${mention.displayName}** lacag **$${amount.toLocaleString()}**!\n\n` +
+        `💼  **Xisaabta cusub ee ${mention.displayName}: $${receiverBalance.toLocaleString()}**`
     )
     .setTimestamp();
 

@@ -12,9 +12,7 @@ export async function handleBomb(message: Message): Promise<void> {
   const channelId = message.channelId;
 
   if (hasGame(channelId)) {
-    await message.reply(
-      "❌  A game is already running in this channel! Wait for it to finish."
-    );
+    await message.reply("❌  Ciyaar ayaa horay u socota channel-kan! Sug ay dhammaato.");
     return;
   }
 

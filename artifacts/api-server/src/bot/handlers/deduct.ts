@@ -1,25 +1,25 @@
 import type { Message } from "discord.js";
 import { EmbedBuilder } from "discord.js";
-import { addBalance, getBalance } from "../store.js";
+import { getBalance, addBalance } from "../store.js";
 
 const OWNER_ID = process.env["BOT_OWNER_ID"] ?? "";
 
 export async function handleDeduct(message: Message, args: string[]): Promise<void> {
   if (message.author.id !== OWNER_ID) {
-    await message.reply("❌  Only the bot owner can use this command.");
+    await message.reply("❌  Amarka waxaa isticmaali kara bot-ka milkiilaha kaliya.");
     return;
   }
 
   const mention = message.mentions.users.first();
   if (!mention) {
-    await message.reply("❌  Usage: `!deduct @user amount`");
+    await message.reply("❌  Isticmaal: `!deduct @qof xad`");
     return;
   }
 
   const amountStr = args[1];
   const amount = amountStr ? parseInt(amountStr, 10) : NaN;
   if (isNaN(amount) || amount <= 0) {
-    await message.reply("❌  Please enter a valid positive amount.");
+    await message.reply("❌  Xad sax ah geli.");
     return;
   }
 
@@ -28,11 +28,11 @@ export async function handleDeduct(message: Message, args: string[]): Promise<vo
   const newBalance = addBalance(mention.id, -deducted);
 
   const embed = new EmbedBuilder()
-    .setTitle("💸  Money Deducted")
+    .setTitle("💸  Lacag La Jaaray")
     .setColor(0xff6b00)
     .setDescription(
-      `✅  Removed **$${deducted.toLocaleString()}** from **${mention.displayName}**'s wallet.\n\n` +
-        `💼  New balance: **$${newBalance.toLocaleString()}**`
+      `✅  **$${deducted.toLocaleString()}** ayaa laga jaaray **${mention.displayName}**.\n\n` +
+        `💼  Xisaabta cusub: **$${newBalance.toLocaleString()}**`
     )
     .setTimestamp();
 

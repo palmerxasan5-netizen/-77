@@ -11,21 +11,21 @@ function formatDuration(ms: number): string {
   const m = Math.floor((totalSec % 3600) / 60);
   const s = totalSec % 60;
   const parts: string[] = [];
-  if (h > 0) parts.push(`${h} Hour${h !== 1 ? "s" : ""}`);
-  if (m > 0) parts.push(`${m} Minute${m !== 1 ? "s" : ""}`);
-  if (s > 0) parts.push(`${s} Second${s !== 1 ? "s" : ""}`);
+  if (h > 0) parts.push(`${h} saac`);
+  if (m > 0) parts.push(`${m} dq`);
+  if (s > 0) parts.push(`${s} th`);
   return parts.join(" ");
 }
 
 const JOBS = [
-  "delivered packages across town 📦",
-  "cleaned the office windows 🪟",
-  "drove for a rideshare app 🚗",
-  "helped at a food truck 🌮",
-  "coded a small script for a client 💻",
-  "walked dogs in the neighborhood 🐕",
-  "tutored a student online 📚",
-  "fixed a neighbor's fence 🔨",
+  "baakadooyin ayaad geysay 📦",
+  "daaqadaha xafiiska ayaad nadiifisay 🪟",
+  "taksi ayaad watay 🚗",
+  "baaxad raashinka ayaad ka caawinay 🌮",
+  "koodhka yar oo macmiil ah ayaad qortay 💻",
+  "eyda xaafadda ayaad socodsiisay 🐕",
+  "ardayga online ayaad barisay 📚",
+  "xaafadda deriska ayaad faraskeeda hagaajisay 🔨",
 ];
 
 export async function handleWork(message: Message): Promise<void> {
@@ -36,11 +36,11 @@ export async function handleWork(message: Message): Promise<void> {
   if (player.lastWork !== null && now - player.lastWork < COOLDOWN_MS) {
     const remaining = COOLDOWN_MS - (now - player.lastWork);
     const embed = new EmbedBuilder()
-      .setTitle("⏳  Already Worked!")
+      .setTitle("⏳  Horay ayaad u shaqeysay!")
       .setColor(0xff6b00)
       .setDescription(
-        `You've already worked recently. Take a break!\n\n` +
-          `⏰  **Time Remaining: ${formatDuration(remaining)}**`
+        `Wakhti yar ka dib ayaad dib u shaqeysan kartaa.\n\n` +
+          `⏰  **Wakhti haray: ${formatDuration(remaining)}**`
       )
       .setTimestamp();
     await message.reply({ embeds: [embed] });
@@ -53,14 +53,14 @@ export async function handleWork(message: Message): Promise<void> {
   const job = JOBS[Math.floor(Math.random() * JOBS.length)]!;
 
   const embed = new EmbedBuilder()
-    .setTitle("💼  Work Done!")
+    .setTitle("💼  Shaqo la dhammeystay!")
     .setColor(0x00c853)
     .setDescription(
-      `You ${job}\n\n` +
-        `💵  **Earned: $${WORK_PAY.toLocaleString()}**\n` +
-        `💼  **New Balance: $${newBalance.toLocaleString()}**`
+      `Waxaad ${job}\n\n` +
+        `💵  **Lacag la helay: $${WORK_PAY.toLocaleString()}**\n` +
+        `💼  **Xisaabta cusub: $${newBalance.toLocaleString()}**`
     )
-    .setFooter({ text: "You can work again in 2 hours." })
+    .setFooter({ text: "2 saac kadib ayaad dib u shaqeysan kartaa." })
     .setTimestamp();
 
   await message.reply({ embeds: [embed] });

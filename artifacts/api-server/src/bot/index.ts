@@ -12,7 +12,6 @@ import { handleWork } from "./handlers/work.js";
 import { handleGiveCash } from "./handlers/givecash.js";
 import { handleGrant } from "./handlers/grant.js";
 import { handleDeduct } from "./handlers/deduct.js";
-import { handleHelp } from "./handlers/help.js";
 import { scheduleTax } from "./tax.js";
 
 const PREFIX = "!";
@@ -71,9 +70,6 @@ export function startBot(): void {
           break;
         case "deduct":
           await handleDeduct(message, [rest[0] ?? "", rest[1] ?? ""]);
-          break;
-        case "help":
-          await handleHelp(message);
           break;
         default:
           // Unknown command — ignore silently

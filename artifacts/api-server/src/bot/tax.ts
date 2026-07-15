@@ -34,10 +34,10 @@ async function runTaxIfDue(client: Client): Promise<void> {
         await user.send({
           embeds: [
             {
-              title: "🏦  Tax Collected",
+              title: "🏦  Cashuurta La Qaatay",
               description:
-                `**$${TAX_AMOUNT.toLocaleString()}** has been deducted from your wallet.\n\n` +
-                `**Reason:** Automatic 3-Day Tax *(applies to wallets ≥ $25,000)*`,
+                `**$${TAX_AMOUNT.toLocaleString()}** ayaa laga jaaray xisaabtaada.\n\n` +
+                `**Sababta:** Cashuurta todobaadle ee toos ah *(xisaabaha $25,000 ka sareeya ayaa saameeysa)*`,
               color: 0xff6b00,
               timestamp: new Date().toISOString(),
             },
